@@ -8,9 +8,16 @@ const Header = (props) =>{
 const Content = (props)=>{
   return(
   <>
-    <p>{props.osa1} {props.tehtava1}</p>
-    <p>{props.osa2} {props.tehtava2}</p>
-    <p>{props.osa3} {props.tehtava3}</p>
+    <Part osa={props.osa1} tehtava={props.tehtava1} />
+    <Part osa={props.osa2} tehtava={props.tehtava2} />
+    <Part osa={props.osa3} tehtava={props.tehtava3} />
+  </>
+  )
+}
+const Part = (props)=>{
+  return(
+  <>
+    <p>{props.osa} {props.tehtava}</p>
   </>
   )
 }
