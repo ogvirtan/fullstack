@@ -16,10 +16,26 @@ const App = () => {
    
   const [selected, setSelected] = useState(0)
 
+  const [taul, modTaul] = useState(new Uint8Array(anecdotes.length))
+
+  console.log(taul)
+
+  function addVotes (index) {
+    const copy = taul.map((val, i)=>{
+      if (i === index){
+        return val+1
+      }
+      return val
+    })
+    modTaul(copy)
+  }
+
   return (
     <div>
       {anecdotes[selected]}
       <br/>
+      <p>has {taul[selected]} votes</p>
+      <Button onClick={() => addVotes(selected)} text="vote"/>
       <Button onClick={() => setSelected(Math.floor(Math.random()*(anecdotes.length)))} text="next anecdote" />
     </div>
   )
