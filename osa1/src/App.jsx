@@ -4,7 +4,9 @@ const Button = ({onClick, text}) => <button onClick={onClick}>{text}</button>
 
 const Statisticline = (props) => {
   return(
-  <div>{props.data.name} {props.data.value} {props.data.sc}</div>
+  <tr>
+    <td>{props.data.name}</td><td>{props.data.value} {props.data.sc}</td>
+  </tr>
   )
 }
 
@@ -14,20 +16,24 @@ const Statistics = (props) =>{
   if (allValueCount === 0){
     return(
       <div>
-      <h2>statistics</h2>
-      <p>no feedback given</p>
+        <h2>statistics</h2>
+          <p>no feedback given</p>
       </div>
     )
   }
   return(  
     <div>
-    <h2>statistics</h2>
-    <Statisticline data={t[0]} />
-    <Statisticline data={t[2]} />
-    <Statisticline data={t[1]} />
-    <Statisticline data={t[3]} />
-    <Statisticline data={t[4]} />
-    <Statisticline data={t[5]} />
+      <h2>statistics</h2>
+        <table>
+          <tbody>
+          <Statisticline data={t[0]} />
+          <Statisticline data={t[2]} />
+          <Statisticline data={t[1]} />
+          <Statisticline data={t[3]} />
+          <Statisticline data={t[4]} />
+          <Statisticline data={t[5]} />
+          </tbody>
+        </table>
     </div>
   )
 }
