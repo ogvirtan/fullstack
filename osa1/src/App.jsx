@@ -30,13 +30,18 @@ const App = () => {
     modTaul(copy)
   }
 
+  let mostVoted = taul.indexOf(Math.max(...taul));
+
   return (
     <div>
-      {anecdotes[selected]}
-      <br/>
-      <p>has {taul[selected]} votes</p>
-      <Button onClick={() => addVotes(selected)} text="vote"/>
-      <Button onClick={() => setSelected(Math.floor(Math.random()*(anecdotes.length)))} text="next anecdote" />
+      <h1>Anecdote of the day</h1>
+        <p>{anecdotes[selected]}</p>
+        <p>has {taul[selected]} votes</p>
+        <Button onClick={() => addVotes(selected)} text="vote"/>
+        <Button onClick={() => setSelected(Math.floor(Math.random()*(anecdotes.length)))} text="next anecdote" />
+      <h2>Anecdote with most votes</h2>
+        <p>{anecdotes[mostVoted]}</p>
+        <p>has {taul[mostVoted]} votes</p>
     </div>
   )
 }
