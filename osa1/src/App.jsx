@@ -18,8 +18,6 @@ const App = () => {
 
   const [taul, modTaul] = useState(new Uint8Array(anecdotes.length))
 
-  console.log(taul)
-
   function addVotes (index) {
     const copy = taul.map((val, i)=>{
       if (i === index){
