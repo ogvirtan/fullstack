@@ -1,8 +1,11 @@
-const Header = ({name}) =>{
-  return(
-  <>
+const Header = ({name, prio}) =>{
+  if (prio === 1){
+    return(
     <h1>{name}</h1>
-  </>
+  )
+  }
+  return(
+    <h2>{name}</h2>
   )
 }
 
