@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Search from './components/Search'
+import Contact from './components/Contact'
+import Book from './components/Book'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -11,22 +14,24 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
 
-  const contactsToShow = search === ''
-    ? persons
-    : persons.filter(entry => entry.name.toLowerCase().includes(search.toLowerCase()))
-
   const addHenkilo = (event) =>{
     event.preventDefault()
+
     const onlyNames = persons.map(p => p.name)
+
     if (onlyNames.includes(newName)){
       window.alert(`${newName} is already added to the phone book`)
-    }else if(newName === '' || newNumber === ''){
+      setNewName('')
+      setNewNumber('')
+
+    } else if (newName === '' || newNumber === ''){
       window.alert(`fill out both fields`)
+      
     } else {
       setPersons(persons.concat({name: newName, number: newNumber}))
+      setNewName('')
+      setNewNumber('')
     }
-    setNewName('')
-    setNewNumber('')
   }
   const handleNameChange = (event) =>{
     setNewName(event.target.value)
@@ -37,26 +42,15 @@ const App = () => {
    const handleSearchChange = (event) =>{
     setSearch(event.target.value)
   }
+
   return (
     <div>
       <h1>Phonebook</h1>
-      <form>
-          filter shown with <input value = {search} onChange={handleSearchChange}/>
-      </form>
+        <Search input = {search} onChange={handleSearchChange}/>
       <h2>add a new</h2>
-      <form onSubmit = {addHenkilo}>
-        <div>
-          name: <input value = {newName} onChange={handleNameChange}/>
-        </div>
-        <div>
-          number: <input value = {newNumber} onChange={handleNumberChange}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+        <Contact name={newName} number={newNumber} onNumChange = {handleNumberChange} onNameChange= {handleNameChange} onSubmit= {addHenkilo}/>
       <h2>Numbers</h2>
-        {contactsToShow.map(c => <p key = {c.name}>{c.name} {c.number}</p>)}
+        <Book persons = {persons} search={search}/>
     </div>
   )
 
