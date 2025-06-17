@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Search from './components/Search'
 import Contact from './components/Contact'
 import Book from './components/Book'
+import noteService from './services/notes'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -10,15 +10,13 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
 
-  const hook = () =>{
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+  useEffect(()=>{
+    noteService
+      .getAll()
+      .then(initialNotes => {
+        setPersons(initialNotes)
       })
-  }
-
-  useEffect(hook, [])
+  }, [])
 
   const addHenkilo = (event) =>{
     event.preventDefault()
@@ -34,7 +32,11 @@ const App = () => {
       window.alert(`fill out both fields`)
       
     } else {
-      setPersons(persons.concat({name: newName, number: newNumber}))
+      noteService
+      .create({name: newName, number:newNumber})
+      .then( returnedNote => {
+        setPersons(persons.concat(returnedNote))
+      })
       setNewName('')
       setNewNumber('')
     }
