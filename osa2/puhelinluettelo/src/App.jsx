@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Search from "./components/Search";
 import Contact from "./components/Contact";
 import Book from "./components/Book";
+import Notification from "./components/Notification";
 import noteService from "./services/notes";
 
 const App = () => {
@@ -9,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [latestAlert, setAlertStatus] = useState(false);
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {
@@ -38,14 +41,39 @@ const App = () => {
             .then((rN) => {
               setPersons(persons.map((c) => (c.id !== contact.id ? c : rN)));
             })
-            .catch((error) => console.log("", error));
+            .then(() => {
+              setAlertStatus(false);
+              setAlertMessage(`Contact ${newName} modified`);
+              setTimeout(() => {
+                setAlertMessage(null);
+              }, 5000);
+            })
+            .catch((error) => {
+              setAlertStatus(true);
+              setAlertMessage(
+                `Contact ${newName} has already been removed from the server`
+              );
+              setTimeout(() => {
+                setAlertMessage(null);
+              }, 5000);
+              console.log("", error);
+            });
         }
       } else {
         noteService
           .create({ name: newName, number: newNumber })
           .then((returnedNote) => {
             setPersons(persons.concat(returnedNote));
-          });
+          })
+          .then(() => {
+            setAlertStatus(false);
+            setAlertMessage(`Contact ${newName} added`);
+            setTimeout(() => {
+              setAlertMessage(null);
+            }, 5000);
+            setAlertStatus(false);
+          })
+          .catch((error) => console.log("", error));
       }
       setNewName("");
       setNewNumber("");
@@ -62,6 +90,7 @@ const App = () => {
   };
 
   const delContact = (id) => {
+    const delName = persons.find((c) => c.id === id).name;
     noteService
       .remove(id)
       .then(() => {
@@ -70,14 +99,29 @@ const App = () => {
       .then((updatedList) => {
         setPersons(updatedList);
       })
+      .then(() => {
+        setAlertStatus(false);
+        setAlertMessage(`Contact ${delName} deleted`);
+        setTimeout(() => {
+          setAlertMessage(null);
+        }, 5000);
+      })
       .catch((error) => {
-        console.log("fail", error);
+        setAlertStatus(true);
+        setAlertMessage(
+          `Contact ${delName} has already been removed from the server`
+        );
+        setTimeout(() => {
+          setAlertMessage(null);
+        }, 5000);
+        console.log("", error);
       });
   };
 
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification alertmsg={alertMessage} error={latestAlert} />
       <Search input={search} onChange={handleSearchChange} />
       <h2>add a new</h2>
       <Contact
