@@ -1,7 +1,7 @@
-const Search = ({ input, onChange }) => {
+const Search = ({ onChange }) => {
   return (
     <form>
-      find countries <input value={input} onChange={onChange} />{" "}
+      find countries <input onChange={onChange} />{" "}
     </form>
   );
 };

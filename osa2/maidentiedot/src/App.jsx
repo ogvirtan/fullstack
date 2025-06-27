@@ -13,14 +13,18 @@ function App() {
     });
   }, []);
 
-  const handleSearchChange = (event) => {
+  const handleSearchFieldChange = (event) => {
     setSearched(event.target.value);
+  };
+
+  const handleSearchChange = (value) => {
+    setSearched(value);
   };
 
   return (
     <div>
-      <Search input={searched} onChange={handleSearchChange} />
-      <Results data={data} search={searched} />
+      <Search onChange={handleSearchFieldChange} />
+      <Results data={data} search={searched} hsc={handleSearchChange} />
     </div>
   );
 }
