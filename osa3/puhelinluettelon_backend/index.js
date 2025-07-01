@@ -26,13 +26,13 @@ let persons = [
 ];
 
 app.use(express.json());
-app.use(express.static("dist"));
+
 
 morgan.token("post-content", function (req, res) {
   return JSON.stringify(req.body);
 });
 
-app.use((req, res) => {
+app.use((req, res, next) => {
   if (req.method === "POST") {
     morgan(
       ":method :url :status :res[content-length] - :response-time ms :post-content"
@@ -40,7 +40,10 @@ app.use((req, res) => {
   } else {
     morgan("tiny");
   }
+  next()
 });
+
+app.use(express.static("dist"));
 
 app.get("/info", (request, response) => {
   const date = new Date().toString();
