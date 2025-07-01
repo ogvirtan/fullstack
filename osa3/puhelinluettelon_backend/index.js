@@ -36,11 +36,10 @@ app.use((req, res, next) => {
   if (req.method === "POST") {
     morgan(
       ":method :url :status :res[content-length] - :response-time ms :post-content"
-    );
+    )(req,res,next);
   } else {
-    morgan("tiny");
+    morgan("tiny")(req,res,next);
   }
-  next()
 });
 
 app.use(express.static("dist"));
