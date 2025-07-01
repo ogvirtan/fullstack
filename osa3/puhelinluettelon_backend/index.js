@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
 let persons = [
@@ -25,6 +26,11 @@ let persons = [
 ];
 
 app.use(express.json());
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :post-content"
+  )
+);
 
 app.get("/info", (request, response) => {
   const date = new Date().toString();
@@ -56,6 +62,9 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
+  morgan.token("post-content", function (req, res) {
+    return JSON.stringify(req.body);
+  });
   const body = req.body;
 
   if (!body.name) {
@@ -91,6 +100,7 @@ app.post("/api/persons", (req, res) => {
   console.log("", persons);
 });
 
-const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
