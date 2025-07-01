@@ -28,7 +28,7 @@ let persons = [
 app.use(express.json());
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :post-content"
+    "tiny"
   )
 );
 app.use(express.static('dist'))
@@ -63,9 +63,6 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
-  morgan.token("post-content", function (req, res) {
-    return JSON.stringify(req.body);
-  });
   const body = req.body;
 
   if (!body.name) {
