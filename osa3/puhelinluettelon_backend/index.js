@@ -31,6 +31,7 @@ app.use(
     ":method :url :status :res[content-length] - :response-time ms :post-content"
   )
 );
+app.use(express.static('dist'))
 
 app.get("/info", (request, response) => {
   const date = new Date().toString();
