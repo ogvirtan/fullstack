@@ -5,29 +5,6 @@ const app = express();
 
 const Contact = require("./models/contact");
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 const requestLogger = (req, res, next) => {
   console.log("Method:", req.method);
   console.log("Path:  ", req.path);
@@ -100,17 +77,23 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
   const date = new Date().toString();
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`
-  );
+  Contact.find({})
+    .then((contacts) => {
+      res.send(
+        `<p>Phonebook has info for ${contacts.length} people</p><p>${date}</p>`
+      );
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/api/persons", (req, res) => {
-  Contact.find({}).then((contacts) => {
-    res.json(contacts);
-  });
+app.get("/api/persons", (req, res, next) => {
+  Contact.find({})
+    .then((contacts) => {
+      res.json(contacts);
+    })
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (req, res) => {
