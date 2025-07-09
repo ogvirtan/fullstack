@@ -50,6 +50,16 @@ app.delete("/api/persons/:id", (req, res, next) => {
 app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
+  if (!body.name) {
+    if (!body.number) {
+    return res.status(400).json({ error: 'everything missing' })
+  }
+    return res.status(400).json({ error: 'name missing' })
+  }
+  if (!body.number) {
+    return res.status(400).json({ error: 'number missing' })
+  }
+
   const contact = new Contact({
     name: body.name,
     number: body.number,
@@ -107,8 +117,8 @@ const errorHandler = (error, req, res, next) => {
   if (error.name === "CastError") {
     return res.status(400).send({ error: "malformatted id" });
   }
-  if (error.name === "miss") {
-    return res.status(400).send({ error: "fuark" });
+  if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
   }
 
   next(error);
