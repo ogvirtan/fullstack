@@ -1,4 +1,4 @@
-// require("dotenv").config();
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
@@ -86,6 +86,33 @@ app.post("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+  Contact.findById(req.params.id)
+    .then((contact) => {
+      contact.name = body.name;
+      contact.number = body.number;
+
+      return contact.save().then((updatedContact) => {
+        res.json(updatedContact);
+      });
+    })
+    .catch((error) => next(error));
+});
+
+app.get("/info", (req, res) => {
+  const date = new Date().toString();
+  res.send(
+    `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`
+  );
+});
+
+app.get("/api/persons", (req, res) => {
+  Contact.find({}).then((contacts) => {
+    res.json(contacts);
+  });
+});
+
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: "unknown endpoint" });
 };
@@ -106,19 +133,6 @@ const errorHandler = (error, req, res, next) => {
 
 morgan.token("post-content", function (req, res) {
   return JSON.stringify(req.body);
-});
-
-app.get("/info", (req, res) => {
-  const date = new Date().toString();
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`
-  );
-});
-
-app.get("/api/persons", (req, res) => {
-  Contact.find({}).then((contacts) => {
-    res.json(contacts);
-  });
 });
 
 const PORT = process.env.PORT;
