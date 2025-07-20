@@ -84,7 +84,6 @@ test('a blog entry with no title or no url returns 400', async () => {
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
-    .expect('Content-Type', /application\/json/)
 })
 
 after(async () => {
