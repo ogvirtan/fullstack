@@ -1,15 +1,23 @@
 const assert = require('node:assert')
 const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', name: 'initial', passwordHash })
+
+  await user.save()
   await Blog.insertMany(helper.initialBlogs)
 })
 
@@ -30,13 +38,14 @@ describe('GET', () => {
 
 describe('POST', () => {
   test('a valid blog entry is present in the database', async () => {
+    const user = await User.findOne({})
     const newBlog = {
       title: 'testBook',
       author: 'testAuthor',
       url: 'test_url',
-      likes: 0
+      likes: 0,
+      user: user._id
     }
-
     await api
       .post('/api/blogs')
       .send(newBlog)
@@ -55,10 +64,12 @@ describe('POST', () => {
   })
 
   test('a blog entry with no likes-field is present in the database with likes-value set at 0', async () => {
+    const user = await User.findOne({})
     const newBlog = {
       title: 'testBook',
       author: 'testAuthor',
       url: 'test_url',
+      user: user._id
     }
 
     await api
@@ -73,8 +84,10 @@ describe('POST', () => {
   })
 
   test('a blog entry with no title or no url returns 400', async () => {
+    const user = await User.findOne({})
     const newBlog = {
       author: 'testAuthor',
+      user: user._id
     }
 
     await api

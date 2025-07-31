@@ -23,8 +23,12 @@ const errorHandler = async (error, request, response, next) => {
   }
   else if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
+  }
+  else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
     return response.status(400).json({ error: 'expected `username` to be unique' })
+  }
+  else if (error.name === 'TypeError') {
+    return response.status(400).json({ error: 'Username or password missing' })
   }
   return response.status(500).send({ error: error.name })
 }
