@@ -38,16 +38,17 @@ describe('GET', () => {
 
 describe('POST', () => {
   test('a valid blog entry is present in the database', async () => {
-    const user = await User.findOne({})
+    const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    const token = logindata.body.token
     const newBlog = {
       title: 'testBook',
       author: 'testAuthor',
       url: 'test_url',
       likes: 0,
-      user: user._id
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -64,16 +65,17 @@ describe('POST', () => {
   })
 
   test('a blog entry with no likes-field is present in the database with likes-value set at 0', async () => {
-    const user = await User.findOne({})
+    const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    const token = logindata.body.token
     const newBlog = {
       title: 'testBook',
       author: 'testAuthor',
-      url: 'test_url',
-      user: user._id
+      url: 'test_url'
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -84,14 +86,15 @@ describe('POST', () => {
   })
 
   test('a blog entry with no title or no url returns 400', async () => {
-    const user = await User.findOne({})
+    const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    const token = logindata.body.token
     const newBlog = {
-      author: 'testAuthor',
-      user: user._id
+      author: 'testAuthor'
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
   })

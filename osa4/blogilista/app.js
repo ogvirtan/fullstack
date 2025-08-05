@@ -6,10 +6,13 @@ const blogsRouter = require('./controllers/blogs')
 
 const usersRouter = require('./controllers/users')
 
+const loginRouter = require('./controllers/login')
+
 app.use(express.json())
 
 app.use('/api/users', usersRouter)
 app.use('/api/blogs', blogsRouter)
+app.use('/api/login', loginRouter)
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
@@ -30,7 +33,10 @@ const errorHandler = async (error, request, response, next) => {
   else if (error.name === 'TypeError') {
     return response.status(400).json({ error: 'Username or password missing' })
   }
-  return response.status(500).send({ error: error.name })
+  else if (error.name === 'JsonWebTokenError') {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  next(error)
 }
 
 app.use(errorHandler)
