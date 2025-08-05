@@ -102,20 +102,71 @@ describe('POST', () => {
 
 describe('DELETE', () => {
   test('deleting an item actually deletes an item with status code 204', async () => {
-    const blogs = await helper.blogsInDb()
-    const delBlog = blogs[0]
+    const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    const token = logindata.body.token
+    const newBlog = {
+      title: 'testBook1',
+      author: 'testAuthor1',
+      url: 'test_url1'
+    }
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-    await api.delete(`/api/blogs/${delBlog.id}`).expect(204)
+    const Blogs = await helper.blogsInDb()
+    const delBlog = Blogs.slice(-1)[0]
+
+    await api.delete(`/api/blogs/${delBlog.id}`).set('Authorization', `Bearer ${token}`).expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
     const contents = blogsAtEnd.map(b => b.url)
 
     assert(!contents.includes(delBlog.url))
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
+  test('trying to delete an item with invalid token returns 400 with database staying intact', async () => {
+    let logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    let token = logindata.body.token
+    const newBlog = {
+      title: 'testBook1',
+      author: 'testAuthor1',
+      url: 'test_url1'
+    }
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const Blogs = await helper.blogsInDb()
+    const delBlog = Blogs.slice(-1)[0]
+
+    const wronguser = { username: 'rootty', name: 'sheesh', password: 'sekretty' }
+    await api
+      .post('/api/users')
+      .send(wronguser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    logindata = await api.post('/api/login').send(wronguser).expect(200).expect('Content-Type', /application\/json/)
+    token = logindata.body.token
+
+    await api.delete(`/api/blogs/${delBlog.id}`).set('Authorization', `Bearer ${token}`).expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const contents = blogsAtEnd.map(b => b.url)
+
+    assert(contents.includes(delBlog.url))
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
   })
 
-  test('trying to delete with faulty id returns 400 and does not affect database', async () => {
-    await api.delete('/api/blogs/asdasdasd').expect(400)
+  test('trying to delete with faulty id but valid token returns 400 and does not affect database', async () => {
+    const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)
+    const token = logindata.body.token
+    await api.delete('/api/blogs/asdasdasd').set('Authorization', `Bearer ${token}`).expect(400)
 
     const blogsAtEnd = await helper.blogsInDb()
 

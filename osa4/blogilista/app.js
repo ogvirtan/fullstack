@@ -43,7 +43,7 @@ const errorHandler = async (error, request, response, next) => {
     return response.status(400).json({ error: 'expected `username` to be unique' })
   }
   else if (error.name === 'TypeError') {
-    return response.status(400).json({ error: 'Username or password missing' })
+    return response.status(400).json({ error: 'TypeError' })
   }
   else if (error.name === 'JsonWebTokenError') {
     return response.status(401).json({ error: 'token missing or invalid' })
