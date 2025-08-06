@@ -63,6 +63,22 @@ describe('POST', () => {
     assert.strictEqual(latestEntry.url, newBlog.url)
     assert.strictEqual(latestEntry.likes, newBlog.likes)
   })
+  test('a valid blog entry with no token returns 401, does not change database', async () => {
+    const newBlog = {
+      title: 'testBook',
+      author: 'testAuthor',
+      url: 'test_url',
+      likes: 0,
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
 
   test('a blog entry with no likes-field is present in the database with likes-value set at 0', async () => {
     const logindata = await api.post('/api/login').send({ username: 'root', password: 'sekret' }).expect(200).expect('Content-Type', /application\/json/)

@@ -2,25 +2,14 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 
+const middleware = require('./utils/middleware')
 const blogsRouter = require('./controllers/blogs')
-
 const usersRouter = require('./controllers/users')
-
 const loginRouter = require('./controllers/login')
 
 app.use(express.json())
 
-const tokenExtractor = (request, response, next) => {
-  let token = null
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    token = authorization.replace('Bearer ', '')
-  }
-  request.token = token
-  next()
-}
-
-app.use(tokenExtractor)
+app.use(middleware.tokenExtractor)
 
 app.use('/api/users', usersRouter)
 app.use('/api/blogs', blogsRouter)
